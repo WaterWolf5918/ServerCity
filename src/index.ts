@@ -11,16 +11,18 @@ import { spawn } from 'child_process';
 import cors from 'cors';
 import { MinecraftServer } from './server.js';
 
-// const servers = [
-//     {
-//         name: 'WG-Craft',
-//         id: 'wg-craft',
-//         path: 'C:\\Users\\lucas\\Downloads\\plainMinecraftServedr',
-//         state: 'stopped',
-//         stop: void '',
-//         forceStop: void ''
-//     }
-// ];
+const serversList = [
+    {
+        name: 'WG-Craft',
+        id: 'wg-craft',
+        path: 'C:\\Users\\lucas\\Downloads\\plainMinecraftServedr',
+    },
+    {
+        name: 'SG30 Clone',
+        id: 'sg50',
+        path: 'C:\\Users\\lucas\\Downloads\\plainMinecraftServedr',
+    }
+];
 
 const port = 5010;
 
@@ -40,7 +42,7 @@ app.get('/', (req, res) => {
 io.on('connection', (sock) => {
     console.log('a user connected');
     socket = sock;
-
+    
 });
 
 server.listen(port, () => {
@@ -57,29 +59,50 @@ server.on('listening',() => {
 });
 
 function main(socket){
-    const servers = [
-        new MinecraftServer(socket,'WG-Craft','wg-craft','C:\\Users\\lucas\\Downloads\\plainMinecraftServedr')
-    ];
-    servers[0].start();
+    const servers = [];
+    serversList.forEach((ser) => {
+        servers.push(new MinecraftServer(socket, ser.name, ser.id, ser.path));
+    });
+    // const servers = [
+    //     new MinecraftServer(socket,'WG-Craft','wg-craft','C:\\Users\\lucas\\Downloads\\plainMinecraftServedr')
+    // ];
+
 
 
     app.post('/stop/:serverID/force/',(req, res) => {
         console.log(req.params.serverID);
+        let noMatch = true;
         servers.forEach((server) => {
-            if(server.id !== req.params.serverID) {res.sendStatus(404); return;}
+            if(server.id !== req.params.serverID) {return;}
+            noMatch = false;
             server.forceStop();
-            res.sendStatus(200);
         });
+        noMatch ? res.sendStatus(404) : res.sendStatus(200);
     });
     
     app.post('/stop/:serverID/force/',(req, res) => {
         console.log(req.params.serverID);
+        let noMatch = true;
         servers.forEach((server) => {
-            if(server.id !== req.params.serverID) {res.sendStatus(404); return;}
+            if(server.id !== req.params.serverID) {return;}
+            noMatch = false;
             server.stop();
-            res.sendStatus(200);
         });
+        noMatch ? res.sendStatus(404) : res.sendStatus(200);
     });
+
+    app.post('/start/:serverID/',(req, res) => {
+        console.log(req.params.serverID);
+        let noMatch = true;
+        servers.forEach((server) => {
+            if(server.id !== req.params.serverID) {return;}
+            noMatch = false;
+            server.start();
+        });
+        noMatch ? res.sendStatus(404) : res.sendStatus(200);
+    });
+
+
 }
 
 // function startServer(server){

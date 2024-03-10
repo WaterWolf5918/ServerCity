@@ -1,5 +1,6 @@
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import { Socket } from 'socket.io';
+import { BroadcastOperator, Socket } from 'socket.io';
+import { DecorateAcknowledgementsWithMultipleResponses, DefaultEventsMap } from 'socket.io/dist/typed-events';
 
 type ServerState = 'started' | 'stopping' |'stopped' 
 
@@ -16,6 +17,7 @@ export class MinecraftServer {
     state: ServerState;
     socket: MySocket;
     fullConsole: string[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor (socket,serverName, serverID, serverPath, java8=true){
         this.name = serverName;
         this.id = serverID;
@@ -29,6 +31,7 @@ export class MinecraftServer {
     commandHandler(data){
         //@ts-expect-error There is no mcThis in the main class but this function runs in the context of socket.io and we have a socket.io value called mcThis. Now i hate this but i have no other ways to do this  im sorry.
         if (data.serverID !== this.mcThis.id) return;
+
         //@ts-expect-error There is no mcThis in the main class but this function runs in the context of socket.io and we have a socket.io value called mcThis. Now i hate this but i have no other ways to do this  im sorry.
         this.mcThis.child.stdin.write(data.command + '\n');
     }
