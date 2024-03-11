@@ -25,11 +25,14 @@ export class MinecraftServer {
         this.socket = socket;
         this.state = 'stopped';
         this.java8 = java8;
+        this.fullConsole = [];
         console.log(this.id);
     }
 
     commandHandler(data){
+        console.log(data);
         //@ts-expect-error There is no mcThis in the main class but this function runs in the context of socket.io and we have a socket.io value called mcThis. Now i hate this but i have no other ways to do this  im sorry.
+        
         if (data.serverID !== this.mcThis.id) return;
 
         //@ts-expect-error There is no mcThis in the main class but this function runs in the context of socket.io and we have a socket.io value called mcThis. Now i hate this but i have no other ways to do this  im sorry.
@@ -46,6 +49,7 @@ export class MinecraftServer {
 
         this.child.stdout.on('data',(d) => {
             if (this.socket !== undefined) {this.socket.emit('console',{serverID: this.id, message: d.toString()});}
+            this.fullConsole.push(d.toString());
             console.log(d.toString());
         });
 
@@ -58,6 +62,7 @@ export class MinecraftServer {
             if (this.state == 'stopped') return;
             console.debug('On a 1 to 10 scale this process is fucked');
             this.state = 'stopped';
+            this.fullConsole = [];
         });
 
     }
@@ -66,6 +71,7 @@ export class MinecraftServer {
         this.child.stdin.write(this.child.stdin.write('stop\n'));
         this.socket.off('sendCommand',this.commandHandler);
         this.state = 'stopping';
+        
     }
 
     forceStop(){

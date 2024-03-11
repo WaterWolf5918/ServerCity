@@ -9,29 +9,30 @@
 </head>
 <body>
     <div class="row">
-        <div id="serverList" class="column" style="width: 12%;">
-            <ul class="list">
-                <li>Great-WaterCraft</li>
+        <div id="serverList-container" class="column" style="width: 12%;">
+            <ul id="serverList" class="list">
+                <!-- <li>Great-WaterCraft</li>
                 <li>IncelCraft</li>
                 <li>Project Ozone 3</li>
-                <li>Nomifactory</li>
+                <li>Nomifactory</li> -->
             </ul>
         </div>
         <div id="selectMenu" class="column" style="width: 13%;">
-            
-            <ul class="list list-big-font"> 
-                <li style="text-align: center;"><span class="material-symbols-outlined">power_settings_new</span></li>
-                <ul class="list list-big-font hidden"> 
-                    <li>Start</li>
-                    <li>Force Stop</li>
-                    <li>Stop</li>
-                    <li>Restart</li>
+            <div>
+                <ul class="list list-big-font"> 
+                    <li id="powerButton" style="text-align: center;"><span class="material-symbols-outlined">power_settings_new</span></li>
+                    <ul id="powerMenu" class="list list-big-font hidden"> 
+                        <li>Start</li>
+                        <li>Force Stop</li>
+                        <li>Stop</li>
+                        <li>Restart</li>
+                    </ul>
+                    <li>Console</li>
+                    <li>Logs</li>
+                    <li>History</li>
+                    <li>Player Managment</li>
                 </ul>
-                <li>Console</li>
-                <li>Logs</li>
-                <li>History</li>
-                <li>Player Managment</li>
-            </ul>
+            </div>
         </div>
         <div class="column" style="width: 60%; background: #1a1b26;">
             <div id="console-window">
@@ -39,9 +40,6 @@
             </div>
             <button id="console-scroll-down">Scroll To Bottom</button>
             <input id="console-input" type="text">
-            <!-- <div id="console-input">
-
-            </div> -->
         </div>
         <div class="column" style="width: 15%;">
             <ul class="list">

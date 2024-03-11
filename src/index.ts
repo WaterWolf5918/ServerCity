@@ -32,7 +32,7 @@ const io = new Server(server,{cors: {origin: '*'}});
 let socket: Socket ;
 
 
-
+app.use(cors({origin:'*'})); // remove this for public release
 app.use(express.static(path.join(__dirname, '../', 'web')));
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../', 'web', 'index.html'));
@@ -68,6 +68,20 @@ function main(socket){
     // ];
 
 
+    
+    app.get('/servers',(req, res) => {
+        res.send(serversList);
+    });
+
+    app.get('/getConsole/:serverID/',(req, res) => {
+        let noMatch = true;
+        servers.forEach((server: MinecraftServer) => {
+            if(server.id !== req.params.serverID) {return;}
+            noMatch = false;
+            res.send(server.fullConsole);
+        });
+        if (noMatch) res.status(404);
+    });
 
     app.post('/stop/:serverID/force/',(req, res) => {
         console.log(req.params.serverID);
