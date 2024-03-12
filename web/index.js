@@ -1,6 +1,6 @@
 import { io } from 'https://cdn.socket.io/4.7.4/socket.io.esm.min.js';
 let selectedServer = null;
-let lestSelectedServer = null;
+let selectedMenu = 'menuNone';
 const socket = io(':5010',{port: 5010});
 const powerButton = document.getElementById('powerButton');
 const consoleWindow = document.getElementById('console-window');
@@ -14,15 +14,27 @@ socket.on('connect', () => {
 });
 
 socket.on('console',(data) => {
+    console.log(data);
+    console.log(`${selectedServer} | ${data.message}`);
     if(selectedServer == null) return;
     if (data.serverID !== selectedServer) return;
     writeMessageToTerminal(data.message);
 });
 
 document.getElementById('console-input').addEventListener('keypress',(key) => {
-    console.log(key);
     if(key.key == 'Enter'){
-        socket.emit('sendCommand',{serverID: selectedServer,'command': document.getElementById('console-input').value});
+        const command = document.getElementById('console-input').value;
+        
+        fetch(`http://${location.hostname}:5010/command/${selectedServer}/`, 
+            {
+                body: JSON.stringify({'command': command}),
+                method:'post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            });
+        console.log(command);
         document.getElementById('console-input').value = '';
         consoleWindow.scrollTo(0,consoleWindow.scrollHeight);
     }
@@ -36,11 +48,13 @@ servers.forEach((serv) => {
     listItem.id = serv.id;
 
     listItem.onclick = () => {
-        if (selectedServer !== null) { document.getElementById(selectedServer).classList.remove('selectedServer'); }
+        if (selectedServer !== null) { document.getElementById(selectedServer).classList.remove('selected'); }
         selectedServer = serv.id;
-        document.getElementById(selectedServer).classList.add('selectedServer');
+        document.getElementById(selectedServer).classList.add('selected');
         consoleWindow.innerHTML = '';
         restorePastConsole();
+        document.getElementById('selectMenu').classList.remove('hidden');
+        document.getElementById('menuStatus').click();
     };
     serversList.appendChild(listItem);
     console.log(serv.id);
@@ -53,8 +67,6 @@ async function restorePastConsole(){
     messages.forEach((msg) => {
         writeMessageToTerminal(msg);
     });
-    
-
 }
 
 /**
@@ -79,36 +91,6 @@ function scanMessageForType(message){
     if (fatal.test(message)){
         return {color: '#ff5555', type: 'fatal  '};
     }
-    // const regex = new RegExp(/\/(.*)] /gm);
-    // if (!regex.test(message)) return {color: '#c4c8f4', type: 'unknown' };
-    // const regex2 = new RegExp(/\/(.*)] /gm);
-    // const scan = regex2.exec(message)[1];
-
-    // console.log(scan);
-    // let type;
-    // let color;
-    // switch(scan.toLowerCase()){
-    // case 'info': {
-    //     type = 'info';
-    //     color = '#c4c8f4';
-    //     break;
-    // }
-    // case 'warn': {
-    //     type = 'warn';
-    //     color = '#eaa560';
-    //     break;
-    // }
-    // case 'error': {
-    //     type = 'error';
-    //     color = '#df6355';
-    //     break;
-    // }
-    // default: {
-    //     console.log(`HELP ${scan}`);
-    //     type = 'error';
-    //     color = '#df6355';
-    // }
-    // }
     return {color: '#00FFFF', type: 'unknow'};
 }
 
@@ -131,8 +113,37 @@ function writeMessageToTerminal(message,color='unset'){
     if (autoScroll) {consoleWindow.scrollTo(0,consoleWindow.scrollHeight);}
 }
 
-// <div id="console-window">
-// <div class="console-line">
-//     <span>[00:37:54] [Server thread/WARN] [minecraft/MinecraftServer]: Can't keep up! Did the system time change, or is the server overloaded? Running 2134ms behind, skipping 3 tick(s)</span>
-// </div>
-// </div>
+
+
+document.getElementById('actionsMenu').childNodes.forEach((el) => {
+    el.onclick = () => {
+        console.log(el.id);
+        if (selectedMenu !== 'menuNone') {
+            document.getElementById(selectedMenu).classList.remove('selected');
+        }
+        document.getElementById(selectedMenu + 'Col').classList.add('hidden');
+        selectedMenu = el.id;
+        if (selectedMenu == 'menuConsole') {
+            document.getElementById('playerListCol').classList.remove('hidden');
+            consoleWindow.innerHTML = '';
+            restorePastConsole();
+        }else {document.getElementById('playerListCol').classList.add('hidden');}
+        document.getElementById(selectedMenu).classList.add('selected');
+        document.getElementById(selectedMenu + 'Col').classList.remove('hidden');
+    };
+
+});
+
+document.getElementById('powerStart').addEventListener('click',() => {
+    fetch(`http://${location.hostname}:5010/start/${selectedServer}/`, {method:'post'});
+});
+
+document.getElementById('powerFStop').addEventListener('click',() => {
+    fetch(`http://${location.hostname}:5010/stop/${selectedServer}/force`, {method:'post'});
+});
+
+document.getElementById('powerStop').addEventListener('click',() => {
+    fetch(`http://${location.hostname}:5010/stop/${selectedServer}/`, {method:'post'});
+});
+
+document.getElementById('menuConsoleCol');

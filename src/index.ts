@@ -9,7 +9,7 @@ import { createRequire } from 'module';
 import Rcon from 'rcon-srcds';
 import { spawn } from 'child_process';
 import cors from 'cors';
-import { MinecraftServer } from './server.js';
+import { MinecraftServer, MySocket } from './server.js';
 
 const serversList = [
     {
@@ -28,10 +28,10 @@ const port = 5010;
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server,{cors: {origin: '*'}});
-let socket: Socket ;
+export const io = new Server(server,{cors: {origin: '*'}});
+let socket: MySocket ;
 
-
+app.use(express.json());
 app.use(cors({origin:'*'})); // remove this for public release
 app.use(express.static(path.join(__dirname, '../', 'web')));
 app.get('/', (req, res) => {
@@ -39,10 +39,9 @@ app.get('/', (req, res) => {
 });
 
 
-io.on('connection', (sock) => {
+io.on('connection', (sock: MySocket) => {
     console.log('a user connected');
     socket = sock;
-    
 });
 
 server.listen(port, () => {
@@ -55,20 +54,14 @@ server.on('listening',() => {
         clearInterval(timer);
         main(socket);
     },200);
-    
 });
 
-function main(socket){
+function main(socket: MySocket){
     const servers = [];
     serversList.forEach((ser) => {
         servers.push(new MinecraftServer(socket, ser.name, ser.id, ser.path));
     });
-    // const servers = [
-    //     new MinecraftServer(socket,'WG-Craft','wg-craft','C:\\Users\\lucas\\Downloads\\plainMinecraftServedr')
-    // ];
 
-
-    
     app.get('/servers',(req, res) => {
         res.send(serversList);
     });
@@ -94,7 +87,7 @@ function main(socket){
         noMatch ? res.sendStatus(404) : res.sendStatus(200);
     });
     
-    app.post('/stop/:serverID/force/',(req, res) => {
+    app.post('/stop/:serverID/',(req, res) => {
         console.log(req.params.serverID);
         let noMatch = true;
         servers.forEach((server) => {
@@ -116,7 +109,17 @@ function main(socket){
         noMatch ? res.sendStatus(404) : res.sendStatus(200);
     });
 
-
+    app.post('/command/:serverID/',(req, res) => {
+        const body = req.body;
+        console.log(body);
+        let noMatch = true;
+        servers.forEach((server: MinecraftServer) => {
+            if(server.id !== req.params.serverID) {return;}
+            noMatch = false;
+            server.sendCommand(body.command);
+        });
+        noMatch ? res.sendStatus(404) : res.sendStatus(200);
+    });
 }
 
 // function startServer(server){

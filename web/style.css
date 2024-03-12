@@ -86,13 +86,25 @@ li {
     padding: 10px 2px 10px 2px;
 }
 
-.selectedServer {
-    background: red;
+.selected {
+    background: #6c197f;
 }
 
 
-#powerMenu {
+#powerContainer {
+    
+    /* background: red; */
+    /* background: #191a23; */
+    /* border-left: 1px solid #898989; */
+    /* border-bottom: 1px solid #232534; */
+}
 
+#powerButton {
+    background: #1c1d27;
+}
+
+#powerMenu {
+    margin-top: 2px;
 }
 
 #console-scroll-down {

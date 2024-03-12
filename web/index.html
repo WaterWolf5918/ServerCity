@@ -11,38 +11,56 @@
     <div class="row">
         <div id="serverList-container" class="column" style="width: 12%;">
             <ul id="serverList" class="list">
-                <!-- <li>Great-WaterCraft</li>
-                <li>IncelCraft</li>
-                <li>Project Ozone 3</li>
-                <li>Nomifactory</li> -->
             </ul>
         </div>
-        <div id="selectMenu" class="column" style="width: 13%;">
+        <div id="selectMenu" class="column hidden" style="width: 13%;">
             <div>
-                <ul class="list list-big-font"> 
-                    <li id="powerButton" style="text-align: center;"><span class="material-symbols-outlined">power_settings_new</span></li>
-                    <ul id="powerMenu" class="list list-big-font hidden"> 
-                        <li>Start</li>
-                        <li>Force Stop</li>
-                        <li>Stop</li>
-                        <li>Restart</li>
+                <div id="powerContainer">
+                    <div id="powerButton" style="text-align: center;"><span class="material-symbols-outlined">power_settings_new</span></div>
+                    <ul id="powerMenu" class="list list-big-font hidden">         
+                        <li id="powerStart" >Start</li>
+                        <li id="powerFStop" >Force Stop</li>
+                        <li id="powerStop" >Stop</li>
+                        <li id="powerRestart" >Restart</li>
                     </ul>
-                    <li>Console</li>
-                    <li>Logs</li>
-                    <li>History</li>
-                    <li>Player Managment</li>
+                </div>
+
+                <ul id="actionsMenu" class="list list-big-font">
+                    <li id="menuStatus"   >Status</li>
+                    <li id="menuConsole"  >Console</li>
+                    <li id="menuLogs"  >Logs</li>
+                    <li id="menuPlayerMan">Player Managment</li>
                 </ul>
+                <!-- <ul class="list list-big-font"> 
+                </ul> -->
             </div>
         </div>
-        <div class="column" style="width: 60%; background: #1a1b26;">
+        <div id="menuNoneCol" class="column" style="width: 60%; background: #1a1b26;">
+            <h1>No Server Selected</h1>
+        </div>
+
+        <div id="menuStatusCol" class="column hidden " style="width: 60%; background: #1a1b26;">
+                <h1>IDK Tell WaterWolf5918 to make a status page and stop being lazy :)</h1>
+        </div>
+
+        <div id="menuConsoleCol" class="column hidden" style="width: 60%; background: #1a1b26;">
             <div id="console-window">
 
             </div>
             <button id="console-scroll-down">Scroll To Bottom</button>
             <input id="console-input" type="text">
         </div>
-        <div class="column" style="width: 15%;">
-            <ul class="list">
+
+        <div id="menuLogsCol" class="column hidden" style="width: 60%; background: #1a1b26;">
+
+        </div>
+
+        <div id="menuPlayerManCol" class="column hidden" style="width: 60%; background: #1a1b26;">
+
+        </div>
+
+        <div id="playerListCol" class="column hidden" style="width: 15%;">
+            <ul id="playerList" class="list">
                 <li>WaterWolf5918</li>
                 <li>Greatshot101</li>
                 <li>Catazard</li>
