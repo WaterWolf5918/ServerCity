@@ -6,3 +6,8 @@ package-lock.json
 package.json
 server.cer
 server.key
+Docs/.obsidian/app.json
+Docs/.obsidian/appearance.json
+Docs/.obsidian/core-plugins-migration.json
+Docs/.obsidian/core-plugins.json
+Docs/.obsidian/workspace.json
