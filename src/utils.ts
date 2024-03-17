@@ -1,4 +1,5 @@
 /* eslint-disable no-irregular-whitespace */
+import { exec, execSync } from 'child_process';
 import { readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 
@@ -41,4 +42,25 @@ export class ConfigHelper {
             return 'ERROR';
         }
     }
+}
+
+
+interface GetProcess {
+    'BasePriority': number;
+    'Id': number;
+    'MainWindowTitle': string;
+    'PagedMemorySize': number;
+    'PagedMemorySize64': number;
+    'WorkingSet': number;
+    'WorkingSet64': number
+    'Name': string
+    // i want working set
+}
+
+export function getInfoByPID(pid: number){
+    const memory = execSync('Get-Process -Id 3156 | ConvertTo-Json',{shell: 'powershell.exe'});
+    const memJson = JSON.parse(memory.toString());
+    // run test.ps1 to get cpu usage
+    
+    console.log(memJson.PagedMemorySize64);
 }
