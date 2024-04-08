@@ -4,9 +4,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as url from 'url';
 import { Server, Socket } from 'socket.io';
-import { ConfigHelper } from './utils.js';
+import { ConfigHelper, getModListByDir } from './utils.js';
 import { createRequire } from 'module';
-import Rcon from 'rcon-srcds';
 import { spawn } from 'child_process';
 import cors from 'cors';
 import { MinecraftServer, MySocket } from './server.js';
@@ -76,6 +75,28 @@ function main(socket: MySocket){
         if (noMatch) res.status(404);
     });
 
+
+    app.get('/status/:serverID/',(req, res) => {
+        let noMatch = true;
+        
+        servers.forEach((server: MinecraftServer) => {
+            if(server.id !== req.params.serverID) {return;}
+            noMatch = false;
+            const modlist = getModListByDir(server.path);
+            
+            const status = {
+                state: server.state,
+                cpu: 'N/A',
+                ram : 'N/A',
+                startTime: server.startTime,
+                players: server.players.length,
+                loaded: `${modlist.loaded.length} / ${modlist.loaded.length + modlist.disabled.length}`
+            };
+            res.send(status);
+        });
+        if (noMatch) res.status(404);
+    });
+
     app.post('/stop/:serverID/force/',(req, res) => {
         console.log(req.params.serverID);
         let noMatch = true;
@@ -87,6 +108,9 @@ function main(socket: MySocket){
         noMatch ? res.sendStatus(404) : res.sendStatus(200);
     });
     
+
+
+
     app.post('/stop/:serverID/',(req, res) => {
         console.log(req.params.serverID);
         let noMatch = true;

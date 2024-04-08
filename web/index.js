@@ -2,6 +2,7 @@ import { io } from 'https://cdn.socket.io/4.7.4/socket.io.esm.min.js';
 import { DateTime } from 'https://moment.github.io/luxon/es6/luxon.min.js';
 let selectedServer = null;
 let selectedMenu = 'menuNone';
+let uptimeTimer = '';
 const socket = io(':5010', { port: 5010 });
 const powerButton = document.getElementById('powerButton');
 const consoleWindow = document.getElementById('console-window');
@@ -15,8 +16,8 @@ socket.on('connect', () => {
 });
 
 socket.on('console', (data) => {
-    console.log(data);
-    console.log(`${selectedServer} | ${data.message}`);
+    // console.log(data);
+    // console.log(`${selectedServer} | ${data.message}`);
     if (selectedServer == null) return;
     if (data.serverID !== selectedServer) return;
     writeMessageToTerminal(data.message);
@@ -35,7 +36,7 @@ document.getElementById('console-input').addEventListener('keypress', (key) => {
                     'Content-Type': 'application/json',
                 },
             });
-        console.log(command);
+        // console.log(command);
         document.getElementById('console-input').value = '';
         consoleWindow.scrollTo(0, consoleWindow.scrollHeight);
     }
@@ -54,12 +55,37 @@ servers.forEach((serv) => {
         document.getElementById(selectedServer).classList.add('selected');
         consoleWindow.innerHTML = '';
         restorePastConsole();
+        getStatus();
         document.getElementById('selectMenu').classList.remove('hidden');
         document.getElementById('menuStatus').click();
     };
     serversList.appendChild(listItem);
     console.log(serv.id);
 });
+
+async function getStatus() {
+    const stateText = document.getElementById('state-text');
+    const cpuText = document.getElementById('cpu-text');
+    const ramText = document.getElementById('ram-text');
+
+    const uptimeText = document.getElementById('uptime-text');
+    const playersText = document.getElementById('player-text');
+    const loadedText = document.getElementById('loaded-text');
+    
+    let status = await fetch(`http://${location.hostname}:5010/status/${selectedServer}/`);
+    status = await status.json();
+    console.log(status);
+
+    status.state = status.state.charAt(0).toUpperCase() + status.state.slice(1);
+    stateText.innerText = status.state;
+    cpuText.innerText   = status.cpu;
+    ramText.innerText   = status.ram;
+
+    uptimeText.innerText = 'Loading...';
+    playersText.innerText = status.players;
+    loadedText.innerText = status.loaded;
+}
+
 
 async function restorePastConsole() {
     let messages = await fetch(`http://${location.hostname}:5010/getConsole/${selectedServer}/`);
@@ -110,25 +136,36 @@ function writeMessageToTerminal(message, color = 'unset') {
     span.innerText = message;
     consoleLine.appendChild(span);
     consoleWindow.appendChild(consoleLine);
-    console.log(autoScroll);
+    // console.log(autoScroll);
     if (autoScroll) { consoleWindow.scrollTo(0, consoleWindow.scrollHeight); }
 }
 
 
 
 document.getElementById('actionsMenu').childNodes.forEach((el) => {
-    el.onclick = () => {
+    el.onclick = async () => {
         console.log(el.id);
         if (selectedMenu !== 'menuNone') {
             document.getElementById(selectedMenu).classList.remove('selected');
         }
         document.getElementById(selectedMenu + 'Col').classList.add('hidden');
         selectedMenu = el.id;
-        if (selectedMenu == 'menuConsole') {
+        switch(selectedMenu){
+        case 'menuConsole': {
             document.getElementById('playerListCol').classList.remove('hidden');
-            consoleWindow.innerHTML = '';
-            restorePastConsole();
-        } else { document.getElementById('playerListCol').classList.add('hidden'); }
+            break;
+        }
+        case 'menuStatus': {
+            break;
+        }
+        }
+        document.getElementById('playerListCol').classList.add('hidden');
+
+        // if (selectedMenu == 'menuConsole') {
+        //     document.getElementById('playerListCol').classList.remove('hidden');
+        //     consoleWindow.innerHTML = '';
+        //     restorePastConsole();
+        // } else { document.getElementById('playerListCol').classList.add('hidden'); }
         document.getElementById(selectedMenu).classList.add('selected');
         document.getElementById(selectedMenu + 'Col').classList.remove('hidden');
     };
@@ -148,6 +185,16 @@ document.getElementById('powerStop').addEventListener('click', () => {
 });
 
 // document.getElementById('menuConsoleCol');
+
+
+
+socket.on('statusUpdate',(data) => {
+    console.log(data);
+    if (selectedServer == null) return;
+    if (data.serverID !== selectedServer) return;
+    console.log(data);
+    document.getElementById('state-text').innerText = data.state;
+});
 
 
 

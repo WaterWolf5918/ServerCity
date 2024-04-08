@@ -16,6 +16,11 @@ Returns an array of json objects with the following format
 #### C -> S
 Returns an array of strings, each string is one non word wrapped line.
 
+### GET: /status/:serverID/
+#### C -> S
+Returns a JSON object with the following format
+
+
 
 ### POST: /stop/:serverID/
 #### C -> S

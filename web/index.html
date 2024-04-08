@@ -61,7 +61,7 @@
                         <div style="text-align: center;">
                             <span>Status</span>
                         </div>
-                        <span>Online</span>
+                        <span id="state-text" >Unknown</span>
                     </div>
                 </div>
 
@@ -76,7 +76,7 @@
                         <div style="text-align: center;">
                             <span>CPU</span>
                         </div>
-                        <span>10%</span>
+                        <span id="cpu-text">NULL</span>
                     </div>
                 </div>
 
@@ -90,7 +90,8 @@
                         <div style="text-align: center;">
                             <span>RAM</span>
                         </div>
-                        <span>33% <span style="color: #dddddd">(1024 GB / 3043 GB)</span></span>
+                        <span id="ram-text">NULL</span>
+                        <!-- <span>33% <span style="color: #dddddd">(1024 GB / 3043 GB)</span></span> -->
                     </div>
 
                 </div>
@@ -111,7 +112,7 @@
                         <div style="text-align: center;">
                             <span>Uptime</span>
                         </div>
-                        <span>143 hours</span>
+                        <span id="uptime-text">NULL</span>
                     </div>
                 </div>
 
@@ -126,7 +127,7 @@
                         <div style="text-align: center;">
                             <span>Players</span>
                         </div>
-                        <span>2 / 20</span>
+                        <span id="player-text">0 / 0</span>
                     </div>
                 </div>
 
@@ -140,14 +141,14 @@
                         <div style="text-align: center;">
                             <span>Mods / Plugins Loaded</span>
                         </div>
-                        <span>127 / 130</span>
+                        <span id="loaded-text">0 / 0</span>
                     </div>
 
                 </div>
             </div>
 
 
-            <div>
+            <div class="hidden">
                 <canvas id="myChart"></canvas>
             </div>
             
