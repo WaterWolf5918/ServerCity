@@ -5,7 +5,7 @@ A minecraft server wrapper built in nodejs
 * Add Muilt Server Support
 * Add Better GUI
 * Remote Chat
-* CPU Graph 
+* CPU Graph (might not be doable on windows )
 * RAM Graph 
 * Auto Backups 
 * Server Creation 
