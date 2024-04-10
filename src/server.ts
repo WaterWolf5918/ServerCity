@@ -3,7 +3,8 @@ import { BroadcastOperator, Socket } from 'socket.io';
 import { DecorateAcknowledgementsWithMultipleResponses, DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { io } from '.';
 import pidusage from 'pidusage';
-import { getInfoByPID } from './utils';
+import { formatLog, getInfoByPID } from './utils';
+
 type ServerState = 'started' | 'stopping' |'stopped' | 'forceStopping' | 'crashed'
 
 export interface MySocket extends Socket {
@@ -99,7 +100,7 @@ export class MinecraftServer {
             //run code for when the process crashs
             if (this.state !== 'stopping'){
                 // server crash give up hope
-                const message = `[${new Date().toISOString()}] [Fatel] ${this.id}: Server has stopped unexpectedly`;
+                const message = `[${new Date().toISOString()}] [${this.id}/FATAL] : Server has stopped unexpectedly`;
                 io.emit('statusUpdate',{serverID: this.id, state: 'Crashed' });
                 io.emit('console',{serverID: this.id, message: message });
                 this.fullConsole.push(message);
@@ -108,7 +109,8 @@ export class MinecraftServer {
                 this.state = 'crashed';
             } else {
                 // run code for when the process stops nicely
-                const message = `[${new Date().toISOString()}] [INFO] ${this.id}: Server has stopped gracefully`;
+                // const message = `[${new Date().toISOString()}] [${this.id}/INFO] : Server has stopped gracefully`;
+                const message = formatLog(this.id,'INFO','Server has stopped gracefully');
                 io.emit('statusUpdate',{serverID: this.id, state: 'Stopped' });
                 io.emit('console',{serverID: this.id, message: message });
                 this.fullConsole.push(message);
@@ -123,16 +125,13 @@ export class MinecraftServer {
     stop(){
         if(this.state == 'stopped' || this.state == 'stopping') {console.error('Sorry but the server you are trying to stop is not online'); return;}
         this.state = 'stopping';
-        this.child.stdin.write(this.child.stdin.write('stop\n'));
-        
-        
+        this.child.stdin.write(this.child.stdin.write('stop\n'));   
     }
 
     forceStop(){
         if(this.state == 'stopped' || this.state == 'stopping') {console.error('Sorry but the server you are trying to stop is not online'); return;}
         this.state = 'stopping';
         this.child.kill();
-        
     }
 
 

@@ -16,8 +16,6 @@ socket.on('connect', () => {
 });
 
 socket.on('console', (data) => {
-    // console.log(data);
-    // console.log(`${selectedServer} | ${data.message}`);
     if (selectedServer == null) return;
     if (data.serverID !== selectedServer) return;
     writeMessageToTerminal(data.message);
@@ -116,7 +114,7 @@ function scanMessageForType(message) {
         return { color: '#df6355', type: 'error' };
     }
     if (fatal.test(message)) {
-        return { color: '#ff5555', type: 'fatal  ' };
+        return { color: '#ff5555', type: 'fatal' };
     }
     return { color: '#00FFFF', type: 'unknow' };
 }
@@ -184,8 +182,6 @@ document.getElementById('powerStop').addEventListener('click', () => {
     fetch(`http://${location.hostname}:5010/stop/${selectedServer}/`, { method: 'post' });
 });
 
-// document.getElementById('menuConsoleCol');
-
 
 
 socket.on('statusUpdate',(data) => {
@@ -195,8 +191,6 @@ socket.on('statusUpdate',(data) => {
     console.log(data);
     document.getElementById('state-text').innerText = data.state;
 });
-
-
 
 
 

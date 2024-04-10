@@ -2,36 +2,35 @@
 import { exec, execSync } from 'child_process';
 import { Dirent, existsSync, readFileSync, readdirSync, writeFileSync } from 'fs';
 import path from 'path';
+import { MinecraftServer } from './server';
 
-export class ConfigHelper {
+export class ServerManager {
     configFile: string;
+    servers: MinecraftServer[];
     constructor(configFile: string) {
         this.configFile = configFile;
-    }
-    len(): number {
-        return (this.getFull().length as number);
+        this.servers = [];
     }
 
-    getFull(): Record<string, unknown> {
+    private len(): number {
+        return (this.getServersFile().length as number);
+    }
+
+    getServersFile(): ServerObject[] {
         return JSON.parse(readFileSync(this.configFile, 'utf-8'));
     }
-    setFull(json) {
+
+    private setFull(json) {
         writeFileSync(
             path.join(this.configFile),
             JSON.stringify(json, null, 4),
         );
+        this.configFile = json;
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    get(key: string): any {
-        if (this.getFull()[key] !== null) {
-            return this.getFull()[key];
-        } else {
-            return 'ERROR';
-        }
-    }
-    set(key: string | number, value: unknown): string {
-        if (this.getFull()[key] !== null) {
-            const full = this.getFull();
+
+    private set(key: string | number, value: unknown): string {
+        if (this.getServersFile()[key] !== null) {
+            const full = this.getServersFile();
             full[key] = value;
             writeFileSync(
                 path.join(this.configFile),
@@ -42,6 +41,56 @@ export class ConfigHelper {
             return 'ERROR';
         }
     }
+
+    init(socket){
+        this.getServersFile().forEach((ser) => { this.servers.push(new MinecraftServer(socket, ser.name, ser.id, ser.path)); });
+    }
+
+    addServer(serverObject: ServerObject){
+        console.log(this.len());
+        this.set(this.len(),serverObject);
+    }
+
+    deleteServerByID(id){
+        let result:{error?: string, msg:string} = {error: 'notFound', msg: `Server ${id} was not found`};
+        console.log(`looking for ID ${id}`);
+        const config:ServerObject[] = this.getServersFile();
+        for(let i=0;i<config.length;i++){
+            if (config[i].id !== id) continue;
+            console.log(`Deleted ${config[i].name}`);
+            config.splice(i,1);
+            result = {msg: `Server ${id} was deleted.`};
+        }
+        this.setFull(config);
+        return result;
+    }
+    getServerByID(id): MinecraftServer{
+        let server;
+        this.servers.forEach(ser => {
+            if (ser.id !== id) return;
+            server = ser;
+        });
+        return server;
+    }
+
+
+    getServerConsoleByID(id){
+        const server = this.getServerByID(id);
+        if (server){
+            return (server.fullConsole);
+        } else {
+            return false;
+        }
+    }
+}
+
+
+
+
+export interface ServerObject {
+    name: string,
+    id: string,
+    path: string,
 }
 
 
@@ -100,4 +149,11 @@ export function getInfoByPID(pid: number){
     // console.log(cpu);
 
     return {ram: memJson.WorkingSet64};
+}
+
+export function formatLog(id,level,text){
+    const date = new Date();
+    const timeFormatter = new Intl.DateTimeFormat('en-US',{dateStyle: 'short','timeStyle': 'short','hourCycle':'h24'}).format;
+    const string = `[${timeFormatter(date)}] [${id}/${level}]: ${text}`;
+    return string;
 }
