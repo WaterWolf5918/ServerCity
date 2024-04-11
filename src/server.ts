@@ -1,19 +1,23 @@
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import { BroadcastOperator, Socket } from 'socket.io';
-import { DecorateAcknowledgementsWithMultipleResponses, DefaultEventsMap } from 'socket.io/dist/typed-events';
+import { Socket } from 'socket.io';
 import { io } from '.';
 import pidusage from 'pidusage';
-import { formatLog, getInfoByPID } from './utils';
+import { formatLog } from './utils';
 
-type ServerState = 'started' | 'stopping' |'stopped' | 'forceStopping' | 'crashed'
+type ServerState = 'started' | 'stopping' | 'stopped' | 'forceStopping' | 'crashed'
 
 export interface MySocket extends Socket {
-    mcThis: {id: string, child: ChildProcessWithoutNullStreams}
+    mcThis: { id: string, child: ChildProcessWithoutNullStreams }
 }
 
 export interface Stats {
     cpu: number;
     memory: number;
+    ppid: number;
+    pid: number;
+    ctime: number;
+    elapsed: number;
+    timestamp: number;
 }
 
 export class MinecraftServer {
@@ -31,7 +35,7 @@ export class MinecraftServer {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     cpuChart: any[];
     players: string[];
-    constructor (socket: MySocket,serverName: string, serverID: string, serverPath: string, java8=true){
+    constructor(socket: MySocket, serverName: string, serverID: string, serverPath: string, java8 = true) {
         this.name = serverName;
         this.id = serverID;
         this.path = serverPath;
@@ -47,89 +51,93 @@ export class MinecraftServer {
         console.log(this.id);
     }
 
-    sendCommand(command){
+    sendCommand(command: string) {
         this.child.stdin.write(command + '\n');
     }
 
-    
-    statsUpdate(time){
+    statsUpdate(time: number) {
         setTimeout(() => {
-            this.getStats((stats:Stats) => {
+            this.getStats((stats: Stats) => {
                 console.log(stats);
                 if (this.newTimer == false) return;
                 this.statsUpdate(time);
             });
-        },time);
+        }, time);
     }
 
-    getStats(callback){
+    getStats(callback: (stats: Stats) => void) {
         if (!this.child.pid) return;
-        pidusage(this.child.pid, (err, stats: Stats) => {
-            this.cpuChart.push({time: Date.now(),cpuUsage: stats.cpu});
-            io.emit('cpuUpdate',{serverID: this.id, time: Date.now(), cpuUsage: stats.cpu});
+
+        pidusage(this.child.pid, (_err, stats) => {
+            this.cpuChart.push({ time: Date.now(), cpuUsage: stats.cpu });
+            io.emit('cpuUpdate', { serverID: this.id, time: Date.now(), cpuUsage: stats.cpu });
             callback(stats);
         });
-        
     }
 
-    start(){
-        if (this.state !== 'stopped'){console.error('Server can\'t be started well running or in the process of stopping.'); return;}
-        this.child = spawn('java8',['-jar','server.jar'],{'cwd': this.path});
+    start() {
+        if (this.state !== 'stopped') {
+            console.error('Server can\'t be started well running or in the process of stopping.');
+            return;
+        }
+
+        this.child = spawn('java8', ['-jar', 'server.jar'], { 'cwd': this.path });
         this.state = 'started';
-        io.emit('start',{serverID: this.id});
-        io.emit('statusUpdate',{serverID: this.id, state: this.state });
-        
+
+        io.emit('start', { serverID: this.id });
+        io.emit('statusUpdate', { serverID: this.id, state: this.state });
+
         this.startTime = Date.now();
-        this.child.stdout.on('data',(d) => {
-            // if (this.socket !== undefined) {this.socket.emit('console',{serverID: this.id, message: d.toString()});}
-            io.emit('console',{serverID: this.id, message: d.toString()});
+
+        this.child.stdout.on('data', (d) => {
+            io.emit('console', { serverID: this.id, message: d.toString() });
             this.fullConsole.push(d.toString());
             console.log(d.toString());
         });
+
         this.newTimer = true;
-        // this.statsUpdate(1000);
-        this.child.stderr.on('data',(d) => {
+
+        this.child.stderr.on('data', (d) => {
             console.log(d.toString());
         });
 
-        this.child.on('close',() => {
-            if (this.state == 'stopped') return; // not sure how this could happen
-            // run code for when process stops or crashs
-            io.emit('close',{serverID: this.id});
+        this.child.on('close', () => {
+            if (this.state == 'stopped') return;
 
-            //run code for when the process crashs
-            if (this.state !== 'stopping'){
-                // server crash give up hope
+            io.emit('close', { serverID: this.id });
+
+            if (this.state !== 'stopping') {
                 const message = `[${new Date().toISOString()}] [${this.id}/FATAL] : Server has stopped unexpectedly`;
-                io.emit('statusUpdate',{serverID: this.id, state: 'Crashed' });
-                io.emit('console',{serverID: this.id, message: message });
+                io.emit('statusUpdate', { serverID: this.id, state: 'Crashed' });
+                io.emit('console', { serverID: this.id, message: message });
                 this.fullConsole.push(message);
                 console.debug('On a 1 to 10 scale this server process is fucked');
                 console.log(message);
                 this.state = 'crashed';
             } else {
-                // run code for when the process stops nicely
-                // const message = `[${new Date().toISOString()}] [${this.id}/INFO] : Server has stopped gracefully`;
-                const message = formatLog(this.id,'INFO','Server has stopped gracefully');
-                io.emit('statusUpdate',{serverID: this.id, state: 'Stopped' });
-                io.emit('console',{serverID: this.id, message: message });
+                const message = formatLog(this.id, 'INFO', 'Server has stopped gracefully');
+                
+                io.emit('statusUpdate', { serverID: this.id, state: 'Stopped' });
+                io.emit('console', { serverID: this.id, message });
+                
                 this.fullConsole.push(message);
                 console.log(message);
+                
                 this.state = 'stopped';
             }
+
             this.newTimer = false;
-            
         });
-
     }
-    stop(){
-        if(this.state == 'stopped' || this.state == 'stopping') {console.error('Sorry but the server you are trying to stop is not online'); return;}
+
+    stop() {
+        if (this.state == 'stopped' || this.state == 'stopping') { console.error('Sorry but the server you are trying to stop is not online'); return; }
         this.state = 'stopping';
-        this.child.stdin.write(this.child.stdin.write('stop\n'));   
+        this.child.stdin.write(this.child.stdin.write('stop\n'));
     }
 
-    forceStop(){
-        if(this.state == 'stopped' || this.state == 'stopping') {console.error('Sorry but the server you are trying to stop is not online'); return;}
+    forceStop() {
+        if (this.state == 'stopped' || this.state == 'stopping') { console.error('Sorry but the server you are trying to stop is not online'); return; }
         this.state = 'stopping';
         this.child.kill();
     }
