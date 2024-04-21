@@ -2,11 +2,13 @@
     {
         "name": "WG-Craft",
         "id": "wg-craft",
-        "path": "C:\\Users\\lucas\\Downloads\\plainMinecraftServedr"
+        "path": "C:\\Users\\lucas\\Downloads\\plainMinecraftServedr",
+        "autoStart": false
     },
     {
         "name": "SG30 Clone",
         "id": "sg50",
-        "path": "C:\\Users\\lucas\\Downloads\\plainMinecraftServedr"
+        "path": "C:\\Users\\lucas\\Downloads\\plainMinecraftServedr",
+        "autoStart": false
     }
 ]

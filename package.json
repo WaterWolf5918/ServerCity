@@ -2,7 +2,9 @@
   "name": "server-city",
   "version": "0.1.0",
   "description": "",
-  "main": "dist/index.js",
+  "engines": {"node": ">=16"},
+  "main": "./dist/index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,6 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/express": "^4.17.21",
+    "chalk": "^5.3.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "pidusage": "^3.0.2",

@@ -1,10 +1,12 @@
 /* eslint-disable no-irregular-whitespace */
 import { Dirent, existsSync, readFileSync, readdirSync, writeFileSync } from 'fs';
-import { MinecraftServer, MySocket } from './server';
+import { MinecraftServer, MySocket } from './server.js';
 import { execSync } from 'child_process';
 import path from 'path';
+import { info } from './logger.js';
 
 export interface ServerObject {
+    autoStart: boolean;
     name: string;
     path: string;
     id: string;
@@ -57,12 +59,20 @@ export class ServerManager {
         }
     }
 
-    init(socket: MySocket) {
-        this.getServersFile().forEach((ser) => { this.servers.push(new MinecraftServer(socket, ser.name, ser.id, ser.path)); });
+    init() {
+        this.getServersFile().forEach((ser) => {
+            const mcServer = new MinecraftServer(ser.name, ser.id, ser.path);
+            this.servers.push(mcServer);
+            // do this after so the server is added to the server list so nothing explodes
+            if (ser.autoStart) {
+                info('Init',`Automatically starting server ${ser.name}`);
+                mcServer.start();
+                
+            } 
+        });
     }
 
-    addServer(serverObject: ServerObject){
-        console.log(this.len());
+    addServer(serverObject: ServerObject) {
         this.set(this.len(),serverObject);
     }
 
@@ -82,6 +92,7 @@ export class ServerManager {
     //         }
     //     }
     // }
+
 
     getServerByID(id: string) {
         for(const server of this.servers) {

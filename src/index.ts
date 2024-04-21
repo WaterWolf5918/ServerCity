@@ -2,53 +2,65 @@ import express from 'express';
 import { createServer } from 'http';
 import * as path from 'path';
 import { Server } from 'socket.io';
-import { ServerManager, getModListByDir } from './utils.js';
+import { ServerManager, formatLog, getModListByDir } from './utils.js';
 import cors from 'cors';
 import { MySocket } from './server.js';
+import { readdirSync } from 'fs';
+import { networkInterfaces } from 'os';
+import chalk from 'chalk';
+import { info,warn } from './logger.js';
+
 
 let socket: MySocket;
+
+/**@deprecated */
+const __dirname = import.meta.dirname;
 const port = 5010;
 const app = express();
 const server = createServer(app);
-const serverManager = new ServerManager(path.join(__dirname,'../servers.json'));
+const serverManager = new ServerManager(path.join(import.meta.dirname,'../servers.json'));
 export const io = new Server(server,{cors: {origin: '*'}});
 
 app.use(express.json());
 app.use(cors({origin:'*'})); // remove this for public release
-app.use(express.static(path.join(__dirname, '../', 'web')));
+app.use(express.static(path.join(import.meta.dirname, '../', 'web')));
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../web/index.html'));
+    res.sendFile(path.join(import.meta.dirname, '../web/index.html'));
 });
 
-server.on('listening',() => {
-    const timer = setInterval(() => {
-        if (socket == undefined) {return;}
-        clearInterval(timer);
-        main(socket);
-    },200);
-});
 
 // @todo There should be a little popup or modal
 // telling the client it's not the active one.
 io.on('connection', (sock: MySocket) => {
-    if(socket) console.warn('[/!\\] Client attempted to connect while another one is connected.');
+    if(socket) warn('SocketIO','Client attempted to connect while another one is connected.');
     socket = sock;
 });
 
 server.listen(port, () => {
-    console.log(`Starting server on port ${port}.`);
-
-    process.on('SIGINT', () => {
-        server.close(); process.exit();
+    info('Main',`Server started on port ${port}`);
+    const interfaces = networkInterfaces();
+    Object.entries(interfaces).forEach(item => {
+        item[1].forEach(info => {
+            console.log(`    ${item[0]}: ${chalk.cyan(`http://${info.address}:${port}`)}`);
+        });
     });
+    main();
 });
 
-function main(socket: MySocket) {
-    serverManager.init(socket);
+function main() {
+    serverManager.init();
     
-    // Remove this if not needed
-    // console.log(serverManager.getServerByID('wg-craft').name);
+    app.get('/dirList/:dir', (_req, res) => {
+        const list = [];
+        let dir = _req.params.dir;
+        dir = dir.replaceAll('@','/');
+        readdirSync(dir,{withFileTypes: true}).forEach(item => {
+            if (!item.isDirectory()) return;
+            list.push(item.name);
+        });
+        res.send(list);
+    });
 
     app.get('/servers', (_req, res) => {
         res.send(serverManager.getServersFile());

@@ -99,6 +99,10 @@ li {
     /* border-bottom: 1px solid #232534; */
 }
 
+#addServerButton {
+    background: #1c1d27;
+}
+
 #powerButton {
     background: #1c1d27;
 }
@@ -121,6 +125,16 @@ li {
     overflow: hidden;
     overflow-y: scroll;
     height: calc((100% - 28px) - 24px);
+    
+}
+
+/* idk why both of this need user select set but they di */
+#console-window > div > span  {
+    user-select:text;
+}
+
+#console-window > div  {
+    user-select:all;
 }
 
 #serverList-container {
@@ -182,3 +196,5 @@ li {
     display: flex;
     align-items: center;
 }
+
+.topmost-menu-button { background: #1c1d27;}

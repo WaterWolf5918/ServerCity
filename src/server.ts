@@ -1,8 +1,10 @@
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { Socket } from 'socket.io';
-import { io } from '.';
+import { io } from './index.js';
 import pidusage from 'pidusage';
-import { formatLog } from './utils';
+import { formatLog } from './utils.js';
+import { debug, fatal, info } from './logger.js';
+import { error } from 'console';
 
 type ServerState = 'started' | 'stopping' | 'stopped' | 'forceStopping' | 'crashed'
 
@@ -20,6 +22,13 @@ export interface Stats {
     timestamp: number;
 }
 
+export interface player {
+    name: string,
+    ip: string,
+    eid: string | number,
+    joinCords: string
+}
+
 export class MinecraftServer {
     java8: boolean;
     name: string;
@@ -34,12 +43,12 @@ export class MinecraftServer {
     newTimer: boolean;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     cpuChart: any[];
-    players: string[];
-    constructor(socket: MySocket, serverName: string, serverID: string, serverPath: string, java8 = true) {
+    players: player[];
+    constructor(serverName: string, serverID: string, serverPath: string, java8 = true) {
         this.name = serverName;
         this.id = serverID;
         this.path = serverPath;
-        this.socket = socket;
+
         this.state = 'stopped';
         this.java8 = java8;
         this.fullConsole = [];
@@ -48,7 +57,6 @@ export class MinecraftServer {
         this.newTimer = false;
         this.cpuChart = [];
         this.players = [];
-        console.log(this.id);
     }
 
     sendCommand(command: string) {
@@ -77,9 +85,11 @@ export class MinecraftServer {
 
     start() {
         if (this.state !== 'stopped') {
-            console.error('Server can\'t be started well running or in the process of stopping.');
+            error(this.id,'Server can\'t be started well running or in the process of stopping.');
             return;
         }
+
+        info(this.id,'Server is starting');
 
         this.child = spawn('java8', ['-jar', 'server.jar'], { 'cwd': this.path });
         this.state = 'started';
@@ -92,14 +102,10 @@ export class MinecraftServer {
         this.child.stdout.on('data', (d) => {
             io.emit('console', { serverID: this.id, message: d.toString() });
             this.fullConsole.push(d.toString());
-            console.log(d.toString());
+            this.parseJoinLeaveEvents(d.toString());
         });
 
         this.newTimer = true;
-
-        this.child.stderr.on('data', (d) => {
-            console.log(d.toString());
-        });
 
         this.child.on('close', () => {
             if (this.state == 'stopped') return;
@@ -108,11 +114,14 @@ export class MinecraftServer {
 
             if (this.state !== 'stopping') {
                 const message = `[${new Date().toISOString()}] [${this.id}/FATAL] : Server has stopped unexpectedly`;
+                
                 io.emit('statusUpdate', { serverID: this.id, state: 'Crashed' });
                 io.emit('console', { serverID: this.id, message: message });
+
                 this.fullConsole.push(message);
-                console.debug('On a 1 to 10 scale this server process is fucked');
-                console.log(message);
+                debug(this.id,'On a 1 to 10 scale this server process is fucked');
+                fatal(this.id,'Server has stopped unexpectedly');
+
                 this.state = 'crashed';
             } else {
                 const message = formatLog(this.id, 'INFO', 'Server has stopped gracefully');
@@ -121,7 +130,7 @@ export class MinecraftServer {
                 io.emit('console', { serverID: this.id, message });
                 
                 this.fullConsole.push(message);
-                console.log(message);
+                info(this.id,'Server has stopped gracefully');
                 
                 this.state = 'stopped';
             }
@@ -142,5 +151,29 @@ export class MinecraftServer {
         this.child.kill();
     }
 
-
+    private parseJoinLeaveEvents(message: string) {
+        const joinRegex = /.*\[Server thread\/INFO] \[minecraft\/PlayerList]: (.*)\[\/(.*):.*] logged in with entity id (.*) at \((.*)\)/gm;
+        const leaveRegex = /.*\[Server thread\/INFO] \[minecraft\/NetHandlerPlayServer]: (.*) lost connection: (.*)/gm;
+        const join = joinRegex.exec(message);
+        const leave = leaveRegex.exec(message);
+        if (join) {
+            join.shift();
+            const joinData = {name: join[0],ip: join[1],eid: join[2],joinCords: join[3]};
+            this.players.push(joinData);
+            console.log(joinData);
+            console.table(this.players);
+            io.emit('playerlistUpdate', { serverID: this.id, playerlist: this.players });
+        } 
+        else if (leave) {
+            leave.shift();
+            const leaveData = {name: leave[0],disconnectReason: leave[1]};
+            for (let i=0;i<this.players.length;i++) {
+                if (this.players[i].name == leaveData.name) {
+                    this.players.splice(i,1);
+                }
+            }
+            console.log(leaveData);
+            io.emit('playerlistUpdate', { serverID: this.id, playerlist: this.players });
+        }
+    }
 }
