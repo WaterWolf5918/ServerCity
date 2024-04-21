@@ -18,8 +18,3 @@ drawDirList('@');
 export function setSelectedServer(value) { selectedServer = value; }
 export function setSelectedMenu(value) { selectedMenu = value; }
 export function setDirPath(value) { dirPath = value; }
-
-
-
-
-
