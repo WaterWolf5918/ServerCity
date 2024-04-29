@@ -84,7 +84,7 @@ export class MinecraftServer {
     }
 
     start() {
-        if (this.state !== 'stopped') {
+        if (this.state == 'stopping' || this.state == 'started') {
             error(this.id,'Server can\'t be started well running or in the process of stopping.');
             return;
         }
@@ -95,7 +95,7 @@ export class MinecraftServer {
         this.state = 'started';
 
         io.emit('start', { serverID: this.id });
-        io.emit('statusUpdate', { serverID: this.id, state: this.state });
+        io.emit('statusUpdate', { serverID: this.id, serverName:this.name, state: this.state });
 
         this.startTime = Date.now();
 
@@ -115,7 +115,7 @@ export class MinecraftServer {
             if (this.state !== 'stopping') {
                 const message = `[${new Date().toISOString()}] [${this.id}/FATAL] : Server has stopped unexpectedly`;
                 
-                io.emit('statusUpdate', { serverID: this.id, state: 'Crashed' });
+                io.emit('statusUpdate', { serverID: this.id, serverName:this.name, state: 'crashed' });
                 io.emit('console', { serverID: this.id, message: message });
 
                 this.fullConsole.push(message);
@@ -126,7 +126,7 @@ export class MinecraftServer {
             } else {
                 const message = formatLog(this.id, 'INFO', 'Server has stopped gracefully');
                 
-                io.emit('statusUpdate', { serverID: this.id, state: 'Stopped' });
+                io.emit('statusUpdate', { serverID: this.id, serverName:this.name, state: 'stopped' });
                 io.emit('console', { serverID: this.id, message });
                 
                 this.fullConsole.push(message);
@@ -147,7 +147,7 @@ export class MinecraftServer {
 
     forceStop() {
         if (this.state == 'stopped' || this.state == 'stopping') { console.error('Sorry but the server you are trying to stop is not online'); return; }
-        this.state = 'stopping';
+
         this.child.kill();
     }
 

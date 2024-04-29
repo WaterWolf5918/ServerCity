@@ -14,20 +14,20 @@
     <div class="row">
         <div id="serverList-container" class="column" style="width: 12%;">
             <div id="addServerContainer">
-                <div id="addServerButton" style="text-align: center;"><span class="material-symbols-outlined">add</span></div>
+                <div id="addServerButton" class="topmost-menu-button" style="text-align: center;"><span class="material-symbols-outlined">add</span></div>
                 <ul id="addServerMenu" class="list list-big-font hidden">         
                     <li id="createServer" >Create Server</li>
                     <li id="importServer" >Import Existing Server</li>
                 </ul>
             </div>
             <ul id="serverList" class="list">
-
+                <li id="overview">Overview</li>
             </ul>
         </div>
         <div id="selectMenu" class="column hidden" style="width: 13%;">
             <div>
                 <div id="powerContainer">
-                    <div id="powerButton" style="text-align: center;"><span class="material-symbols-outlined">power_settings_new</span></div>
+                    <div id="powerButton" class="topmost-menu-button" style="text-align: center;"><span class="material-symbols-outlined">power_settings_new</span></div>
                     <ul id="powerMenu" class="list list-big-font hidden">         
                         <li id="powerStart" >Start</li>
                         <li id="powerFStop" >Force Stop</li>
@@ -50,7 +50,7 @@
             <h1>No Server Selected</h1>
         </div>
 
-        <div id="menuStatusCol" class="column" style="width: 60%; background: #1a1b26;">
+        <div id="menuStatusCol" class="column hidden" style="width: 60%; background: #1a1b26;">
             <div class="status-header">
                 <span>Server Status</span>
             </div>
@@ -158,7 +158,7 @@
             <div class="hidden">
                 <canvas id="myChart"></canvas>
             </div>
-            <ol id="dirList">
+            <ol id="dirList" class="hidden">
                     
             </ol>
                 <!-- <h1>IDK Tell WaterWolf5918 to make a status page and stop being lazy :)</h1> -->
@@ -188,8 +188,17 @@
                 <li>LegotronForce</li>
             </ul>
         </div>
+
+        <div id="overviewPanel" class="column">
+            <h1>WaterWolf needs to create a overview page</h1>
+        </div>
       </div> 
 
+      <div id="overlay2">
+        <div id="notesArea">
+
+        </div>
+      </div>
     <script type="module" src="index.js"></script>
 </body>
 </html>

@@ -101,6 +101,7 @@ li {
 
 #addServerButton {
     background: #1c1d27;
+
 }
 
 #powerButton {
@@ -124,7 +125,7 @@ li {
 #console-window {
     overflow: hidden;
     overflow-y: scroll;
-    height: calc((100% - 28px) - 24px);
+    height: calc((100% - 29px) - 25px);
     
 }
 
@@ -140,6 +141,10 @@ li {
 #serverList-container {
     box-shadow: -1px 0px 0px #1e1e29 inset;
     /* border-right: 3px solid #1e1e29; */
+}
+
+#serverList{
+    margin-top: 0px;
 }
 
 #selectMenu {
@@ -197,4 +202,96 @@ li {
     align-items: center;
 }
 
-.topmost-menu-button { background: #1c1d27;}
+.topmost-menu-button {
+    margin-top: 4px;
+}
+
+
+#overlay2 {
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    user-select: none;
+    pointer-events: none;
+    background: none;
+}
+
+
+#notesArea {
+    margin: 10px;
+}
+
+.note {
+    /* background: linear-gradient(90deg, rgba(108,25,127,1) 0%, rgba(16,16,22,1) 20%) !important; */
+    width: max-content;
+    padding: 4px;
+
+    display: flex;
+    margin-top: 6px;
+}
+
+
+.note-icon {
+    align-items: stretch;
+    display: flex;
+    margin-right: 10px;
+}
+
+.note-icon > span {
+
+    justify-self: center;
+    align-self: center;
+}
+
+.note-main > span {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.note-main > p {
+    font-size: 18px;
+    margin-bottom: 0px;
+    white-space: pre-line
+}
+
+.note-close {
+    margin-left: 10px;
+    pointer-events:all;
+}
+.note-close > span {
+    font-size: 24px !important;
+}
+
+@keyframes noteOpen {
+    0% {
+        opacity: 0.0;
+    }
+    100% {
+        opacity:1.0 ;
+    }
+}
+
+@keyframes noteClose {
+    0% {
+        translate: 0px;
+    }
+    100% {
+        translate: -800px;
+        display: none;
+    }
+}
+
+#overview {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    margin-bottom: 16px;
+}
+
+#overviewPanel {
+    width: calc(100% - 12%);
+}

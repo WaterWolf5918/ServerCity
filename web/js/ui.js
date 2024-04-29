@@ -1,6 +1,82 @@
 import { selectedServer, consoleWindow, dirPath, setDirPath } from '../index.js';
 import { scanMessageForType } from './utils.js';
+const noteArea = document.getElementById('notesArea');
 
+
+export class Notification {
+
+    /**
+     * 
+     * @param {string} title  
+     * @param {string} body
+     * @param {'info' | 'warning' | 'error' | 'bug_report' | 'wifi_off' | 'wifi'} type 
+     * @param {number} autoClose 
+     */
+    constructor(title,body,type,autoCloseDelay=8000,color=this.getColorFromType(type)){
+        this.id = crypto.getRandomValues(new Uint8Array(8)).join('-');
+        this.autoCloseDelay = autoCloseDelay;
+        this.body = body;
+        this.title = title;
+        this.type = type;
+
+        const note = document.createElement('div');
+        note.classList.add('note');
+        note.style.background = `linear-gradient(90deg, ${color} 0%, rgba(16,16,22,1) 20%)`;
+        note.id = this.id;
+        note.innerHTML = `
+        <div class="note-icon">
+            <span class="material-symbols-outlined status-icon">
+                ${type}
+            </span>
+        </div>
+        <div class="note-main">
+            <span>${title}</span>
+            <p>${body}</p>
+        </div>
+        <div id="${this.id}-close"class="note-close">
+            <span class="material-symbols-outlined status-icon">
+                close
+            </span>
+        </div>
+        `;
+        noteArea.appendChild(note);
+        document.getElementById(`${this.id}-close`).onclick = () => {this.close();};
+        note.style.animation = 'noteOpen 0.5s linear 1';
+        this.autoClose();
+    }
+    close(){
+        document.getElementById(this.id).style.animation = 'noteClose 0.8s linear 1';
+        setTimeout(() => {
+            document.getElementById(this.id).remove();
+        },700);
+    }
+
+    autoClose(){
+        setTimeout(() => {
+            this.close();
+        },this.autoCloseDelay);
+    }
+
+    getColorFromType(type){
+        console.log(type);
+        switch(type){
+            case 'info':
+                return 'rgba(108,25,127,1)';
+            case 'warning':
+                return 'rgba(255,174,0,1)';
+            case 'error':
+                return 'rgba(255,0,0,1)';
+            case 'bug_report':
+                return 'rgba(0,89,255,1)';
+            case 'wifi_off':
+                return 'rgba(255,0,0,1)';
+            case 'wifi':
+                return 'rgba(0,255,0,1)';
+            default:
+                return 'rgba(100,100,100,1)';
+        }
+    }
+}
 
 export function writeMessageToTerminal(message, color = 'unset') {
     if (color == 'unset') {
@@ -64,3 +140,4 @@ export async function drawDirList() {
         dirListEl.appendChild(dirItem);
     });
 }
+

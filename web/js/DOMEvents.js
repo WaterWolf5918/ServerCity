@@ -1,4 +1,4 @@
-import {selectedServer, selectedMenu, consoleWindow, setSelectedMenu} from '../index.js';
+import {selectedServer, selectedMenu, consoleWindow, setSelectedMenu, setSelectedServer} from '../index.js';
 
 const addServerButton = document.getElementById('addServerButton');
 const powerButton = document.getElementById('powerButton');
@@ -7,6 +7,7 @@ export function handleDOMEvents() {
     handleConsoleInput();
     handleServerActions();
     handlePowerButtons();
+    handleOverview();
 }
 
 function handlePowerButtons() {
@@ -28,7 +29,7 @@ function handleDropdowns() {
     addServerButton.addEventListener('click', () => { document.getElementById('addServerMenu').classList.toggle('hidden'); });
 }
 
-function handleConsoleInput() {
+async function handleConsoleInput() {
     document.getElementById('console-input').addEventListener('keypress', (key) => {
         if (key.key == 'Enter') {
             const command = document.getElementById('console-input').value;
@@ -51,7 +52,7 @@ function handleConsoleInput() {
 
 function handleServerActions() {
     document.getElementById('actionsMenu').childNodes.forEach((el) => {
-        el.onclick = async () => {
+        el.onclick = () => {
             console.log(el.id);
             if (selectedMenu !== 'menuNone') {
                 document.getElementById(selectedMenu).classList.remove('selected');
@@ -72,4 +73,18 @@ function handleServerActions() {
             document.getElementById(selectedMenu + 'Col').classList.remove('hidden');
         };
     });
+}
+
+function handleOverview() {
+    const overview = document.getElementById('overview');
+    overview.onclick = () => {
+        if (selectedServer !== null) { document.getElementById(selectedServer).classList.remove('selected'); }
+        setSelectedServer('overview');
+        document.getElementById(selectedServer).classList.add('selected');
+        document.getElementById(selectedMenu + 'Col').classList.add('hidden');
+        document.getElementById('selectMenu').classList.add('hidden');
+        consoleWindow.innerHTML = '';
+        // document.getElementById('selectMenu').classList.remove('hidden');
+        // document.getElementById('menuStatus').click();
+    };
 }

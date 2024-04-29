@@ -10,6 +10,7 @@ export function init() {
 export async function loadServerList() {
     let servers = await fetch(`http://${location.hostname}:5010/servers`);
     servers = await servers.json();
+    
     servers.forEach((serv) => {
         const listItem = document.createElement('li');
         listItem.innerText = serv.name;
