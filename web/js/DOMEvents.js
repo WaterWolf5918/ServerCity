@@ -60,6 +60,9 @@ function handleServerActions() {
             document.getElementById(selectedMenu + 'Col').classList.add('hidden');
             setSelectedMenu(el.id);
             document.getElementById('playerListCol').classList.add('hidden');
+            document.getElementById(selectedMenu).classList.add('selected');
+            document.getElementById(selectedMenu + 'Col').classList.remove('hidden');
+            document.getElementById('overviewPanel').classList.add('hidden');
             switch(selectedMenu){
                 case 'menuConsole': {
                     document.getElementById('playerListCol').classList.remove('hidden');
@@ -69,8 +72,7 @@ function handleServerActions() {
                     break;
                 }
             }
-            document.getElementById(selectedMenu).classList.add('selected');
-            document.getElementById(selectedMenu + 'Col').classList.remove('hidden');
+
         };
     });
 }
@@ -80,9 +82,11 @@ function handleOverview() {
     overview.onclick = () => {
         if (selectedServer !== null) { document.getElementById(selectedServer).classList.remove('selected'); }
         setSelectedServer('overview');
+        document.getElementById('overviewPanel').classList.remove('hidden');
         document.getElementById(selectedServer).classList.add('selected');
         document.getElementById(selectedMenu + 'Col').classList.add('hidden');
         document.getElementById('selectMenu').classList.add('hidden');
+        document.getElementById('playerListCol').classList.add('hidden');
         consoleWindow.innerHTML = '';
         // document.getElementById('selectMenu').classList.remove('hidden');
         // document.getElementById('menuStatus').click();

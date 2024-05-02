@@ -45,10 +45,10 @@ Returns a http status code
 #### C -> S
 Returns a http status code
 
-| HTTP Code | Desc |
-| ---- | ---- |
-| 200 | Server was found and was sent a start command |
-| 404 | Server was not found. |
+| HTTP Code | Desc                                          |
+| --------- | --------------------------------------------- |
+| 200       | Server was found and was sent a start command |
+| 404       | Server was not found.                         |
 
 ### POST: /command/:serverID/
 #### C -> S

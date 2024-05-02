@@ -9,6 +9,7 @@ import { readdirSync } from 'fs';
 import { networkInterfaces } from 'os';
 import chalk from 'chalk';
 import { info,warn } from './logger.js';
+import { startCPUStats } from './stats.js';
 
 
 let socket: MySocket;
@@ -46,9 +47,10 @@ server.listen(port, () => {
         });
     });
     main();
+    startCPUStats();
 });
 
-function main() {
+async function main() {
     serverManager.init();
     
     app.get('/dirList/:dir', (_req, res) => {

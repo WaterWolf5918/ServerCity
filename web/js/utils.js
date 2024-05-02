@@ -2,7 +2,7 @@ import {selectedServer, consoleWindow} from '../index.js';
 import {writeMessageToTerminal} from './ui.js';
 
 
-let clock;
+export let clock;
 
 export function divideTime(time) {
     const result = {};
@@ -23,6 +23,8 @@ export function divideTime(time) {
 
 
 export async function getStatus() {
+    clearInterval(clock);
+
     const stateText = document.getElementById('state-text');
     const cpuText = document.getElementById('cpu-text');
     const ramText = document.getElementById('ram-text');
@@ -43,7 +45,7 @@ export async function getStatus() {
     uptimeText.innerText = 'Loading...';
     playersText.innerText = status.players;
     loadedText.innerText = status.loaded;
-
+    if (status.startTime == -1) return;
     const then = new Date(status.startTime);
     const now = new Date();
 

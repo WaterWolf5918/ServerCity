@@ -10,7 +10,7 @@ export class Notification {
      * @param {string} title  
      * @param {string} body
      * @param {'info' | 'warning' | 'error' | 'bug_report' | 'wifi_off' | 'wifi'} type 
-     * @param {number} autoClose 
+     * @param {number} autoCloseDelay
      */
     constructor(title,body,type,autoCloseDelay=8000,color=this.getColorFromType(type)){
         this.id = crypto.getRandomValues(new Uint8Array(8)).join('-');

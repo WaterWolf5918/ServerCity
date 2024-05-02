@@ -1,23 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" integrity="sha512-ZwR1/gSZM3ai6vCdI+LVF1zSq/5HznD3ZSTk7kajkaj4D292NLuduDCO1c/NT8Id+jE58KYLKT7hXnbtryGmMg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.1.2/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.2.1/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.0/dist/chartjs-adapter-luxon.umd.min.js"></script>
+    <script src="https://github.com/AlbinoDrought/chartjs-plugin-downsample/releases/download/1.0.2/chartjs-plugin-downsample.min.js"></script>
 </head>
+
 <body>
-    
+
     <div class="row">
         <div id="serverList-container" class="column" style="width: 12%;">
             <div id="addServerContainer">
-                <div id="addServerButton" class="topmost-menu-button" style="text-align: center;"><span class="material-symbols-outlined">add</span></div>
-                <ul id="addServerMenu" class="list list-big-font hidden">         
-                    <li id="createServer" >Create Server</li>
-                    <li id="importServer" >Import Existing Server</li>
+                <div id="addServerButton" class="topmost-menu-button" style="text-align: center;"><span
+                        class="material-symbols-outlined">add</span></div>
+                <ul id="addServerMenu" class="list list-big-font hidden">
+                    <li id="createServer">Create Server</li>
+                    <li id="importServer">Import Existing Server</li>
                 </ul>
             </div>
             <ul id="serverList" class="list">
@@ -27,19 +35,20 @@
         <div id="selectMenu" class="column hidden" style="width: 13%;">
             <div>
                 <div id="powerContainer">
-                    <div id="powerButton" class="topmost-menu-button" style="text-align: center;"><span class="material-symbols-outlined">power_settings_new</span></div>
-                    <ul id="powerMenu" class="list list-big-font hidden">         
-                        <li id="powerStart" >Start</li>
-                        <li id="powerFStop" >Force Stop</li>
-                        <li id="powerStop" >Stop</li>
-                        <li id="powerRestart" >Restart</li>
+                    <div id="powerButton" class="topmost-menu-button" style="text-align: center;"><span
+                            class="material-symbols-outlined">power_settings_new</span></div>
+                    <ul id="powerMenu" class="list list-big-font hidden">
+                        <li id="powerStart">Start</li>
+                        <li id="powerFStop">Force Stop</li>
+                        <li id="powerStop">Stop</li>
+                        <li id="powerRestart">Restart</li>
                     </ul>
                 </div>
 
                 <ul id="actionsMenu" class="list list-big-font">
-                    <li id="menuStatus"   >Status</li>
-                    <li id="menuConsole"  >Console</li>
-                    <li id="menuLogs"  >Logs</li>
+                    <li id="menuStatus">Status</li>
+                    <li id="menuConsole">Console</li>
+                    <li id="menuLogs">Logs</li>
                     <li id="menuPlayerMan">Player Managment</li>
                 </ul>
                 <!-- <ul class="list list-big-font"> 
@@ -62,14 +71,14 @@
                 <div class="status-row-item">
                     <div class="status-icon-wrapper">
                         <span class="material-symbols-outlined status-icon">
-                           bolt
+                            bolt
                         </span>
                     </div>
                     <div class="status-text-wrapper">
                         <div style="text-align: center;">
                             <span>Status</span>
                         </div>
-                        <span id="state-text" >Unknown</span>
+                        <span id="state-text">Unknown</span>
                     </div>
                 </div>
 
@@ -105,7 +114,7 @@
                 </div>
             </div>
 
-            <br/>
+            <br />
 
             <div class="status-row">
                 <!-- row -->
@@ -153,15 +162,21 @@
                     </div>
                 </div>
             </div>
-
-
-            <div class="hidden">
-                <canvas id="myChart"></canvas>
+            <div class="status-chart-flex">
+                <div class="status-chart-half">
+                    <canvas id="serverCPUChart"></canvas>
+                </div>
+                <div class="status-chart-half">
+                    <canvas id="serverRAMChart"></canvas>
+                </div>
             </div>
+
+
+
             <ol id="dirList" class="hidden">
-                    
+
             </ol>
-                <!-- <h1>IDK Tell WaterWolf5918 to make a status page and stop being lazy :)</h1> -->
+            <!-- <h1>IDK Tell WaterWolf5918 to make a status page and stop being lazy :)</h1> -->
         </div>
 
         <div id="menuConsoleCol" class="column hidden" style="width: 60%; background: #1a1b26;">
@@ -190,15 +205,137 @@
         </div>
 
         <div id="overviewPanel" class="column">
-            <h1>WaterWolf needs to create a overview page</h1>
-        </div>
-      </div> 
+            <div>
+                <div class="status-header">
+                    <span>System Usage</span>
+                </div>
+                <div class="status-row">
+                    <div class="row-item">
+                        <div class="system-info">
+                            <table>
+                                <tr>
+                                    <td style="text-align: left;">OS: </td>
+                                    <td> </td>
+                                    <td style="text-align: right;">Windows 10 Home</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: left;">Cpu: </td>
+                                    <td> </td>
+                                    <td style="text-align: right;">Intel Core I5 13600K</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: left;">Memory: </td>
+                                    <td> </td>
+                                    <td style="text-align: right;">16GB</td>
+                                </tr>
 
-      <div id="overlay2">
-        <div id="notesArea">
+                            </table>
+                            <!-- <span>Memory: </span><span style="margin-left: 10%;">16GB</span>
+                            <br />
+                            <span>CPU: </span><span style="margin-left: 10%;">Intel Core I5 13600K</span>
+                            <br />
+                            <span>OS:</span><span style="margin-left: 10%;">Windows 10 Home</span> -->
+                        </div>
+                    </div>
+                    <div class="row-item">
+                        <div class="circle-progress-container">
+                            <p>CPU Usage</p>
+                            <div class="circle-progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0"
+                                aria-valuemax="100">
+                                <span>50%</span>
+                            </div>
+                        </div>
 
+                        <div class="circle-progress-container">
+                            <p>CPU Avg</p>
+                            <div class="circle-progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0"
+                                aria-valuemax="100">
+                                <span>50%</span>
+                            </div>
+                        </div>
+
+                        <div class="circle-progress-container">
+                            <p>Ram Usage</p>
+                            <div class="circle-progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0"
+                                aria-valuemax="100">
+                                <span>50% <br /><span style="font-size: 12px;">16GB / 32GB</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="row-item">
+
+                        <div class="circle-progress-container">
+                            <table>
+                                <tr>
+                                    <th>Name</th>
+                                    <th></th>
+                                    <th>Usage</th>
+                                    <th>Free Space</th>
+                                    <th>Used Space</th>
+
+                                </tr>
+                                <tr>
+                                    <td>Boot SSD (Fastest)</td>
+                                    <td></td>
+                                    <td><progress></progress></td>
+                                    <td>500 GB</td>
+                                    <td>500 GB</td>
+                                </tr>
+                                <tr>
+                                    <td>Samsung 970</td>
+                                    <td></td>
+                                    <td class="progress-bar-table-container">
+                                        <div class="progress-bar-outer">
+                                            <div class="progress-bar-inner">
+                                                50%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>500 GB</td>
+                                    <td>500 GB</td>
+                                </tr>
+                                <tr>
+                                    <td>Main Hard Drive (slow)</td>
+                                    <td></td>
+                                    <td><progress></progress></td>
+                                    <td>500 GB</td>
+                                    <td>500 GB</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <style>
+
+                    </style>
+                </div>
+
+                <div>
+                    <div style="width: 800px;">
+                        <canvas id="cpuChart"></canvas>
+                    </div>
+
+
+                    <script>
+
+                        
+
+                    </script>
+
+                </div>
+
+            </div>
         </div>
-      </div>
-    <script type="module" src="index.js"></script>
+
+        <div id="overlay2">
+            <div id="notesArea">
+
+            </div>
+        </div>
+        <script type="module" src="index.js"></script>
 </body>
+
 </html>

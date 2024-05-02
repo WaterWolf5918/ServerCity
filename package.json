@@ -2,7 +2,9 @@
   "name": "server-city",
   "version": "0.1.0",
   "description": "",
-  "engines": {"node": ">=16"},
+  "engines": {
+    "node": ">=16"
+  },
   "main": "./dist/index.js",
   "type": "module",
   "scripts": {
@@ -17,7 +19,8 @@
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "pidusage": "^3.0.2",
-    "socket.io": "^4.7.2"
+    "socket.io": "^4.7.2",
+    "systeminformation": "^5.22.7"
   },
   "devDependencies": {
     "@types/node": "^20.11.25",
