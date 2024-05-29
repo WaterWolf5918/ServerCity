@@ -10,4 +10,4 @@ A minecraft server wrapper made in `Node.js`. Uses `express.js` and `socket.io`.
 - [ ] Automatic backups
 - [ ] Creating new servers
 - [ ] Automatically complete Minecraft's EULA
-- [ ] Added Modern Forge Support
+- [ ] Add Modern Forge Support
