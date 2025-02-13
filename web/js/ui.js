@@ -1,4 +1,4 @@
-import { selectedServer, consoleWindow, dirPath, setDirPath } from '../index.js';
+import { selectedServer, consoleWindow } from '../index.js';
 import { scanMessageForType } from './utils.js';
 const noteArea = document.getElementById('notesArea');
 
@@ -111,33 +111,33 @@ export function writePlayerList(list) {
     }
 }
 
-export async function drawDirList() {
-    const dirListEl = document.getElementById('dirList');
-    dirListEl.innerHTML = '';
-    let messages = await fetch(`http://${location.hostname}:5010/dirList/${dirPath}/`);
-    messages = await messages.json();
-    const backButton = document.createElement('li');
-    backButton.innerText = '../';
-    backButton.onclick = () => {
-        const split = dirPath.split('@');
-        split.pop();
-        split.pop();
-        console.log(split);
-        setDirPath(split.join('@'));
-        if (dirPath.charAt(0) !== '@'){ setDirPath(`@${dirPath}@`); }
-        setDirPath(dirPath + '@');
-        drawDirList();
-    };
-    dirListEl.appendChild(backButton);
-    messages.forEach(element => {
-        const dirItem = document.createElement('li');
-        dirItem.innerText = element;
-        dirItem.onclick = () => {
-            setDirPath(`${dirPath}${element}@`); // I miss +=
-            drawDirList();
-        };
+// export async function drawDirList() {
+//     const dirListEl = document.getElementById('dirList');
+//     dirListEl.innerHTML = '';
+//     let messages = await fetch(`http://${location.hostname}:5010/dirList/${dirPath}/`);
+//     messages = await messages.json();
+//     const backButton = document.createElement('li');
+//     backButton.innerText = '../';
+//     backButton.onclick = () => {
+//         const split = dirPath.split('@');
+//         split.pop();
+//         split.pop();
+//         console.log(split);
+//         setDirPath(split.join('@'));
+//         if (dirPath.charAt(0) !== '@'){ setDirPath(`@${dirPath}@`); }
+//         setDirPath(dirPath + '@');
+//         drawDirList();
+//     };
+//     dirListEl.appendChild(backButton);
+//     messages.forEach(element => {
+//         const dirItem = document.createElement('li');
+//         dirItem.innerText = element;
+//         dirItem.onclick = () => {
+//             setDirPath(`${dirPath}${element}@`); // I miss +=
+//             drawDirList();
+//         };
         
-        dirListEl.appendChild(dirItem);
-    });
-}
+//         dirListEl.appendChild(dirItem);
+//     });
+// }
 

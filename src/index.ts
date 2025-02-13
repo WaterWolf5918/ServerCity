@@ -53,10 +53,13 @@ server.listen(port, () => {
 async function main() {
     serverManager.init();
     
-    app.get('/dirList/:dir', (_req, res) => {
+    app.get('/dirList/:dir/', (req, res) => {
         const list = [];
-        let dir = _req.params.dir;
-        dir = dir.replaceAll('@','/');
+        console.log('test');
+        console.log(req.params.dir);
+        const dir = req.params.dir;
+        
+        // dir = dir.replaceAll('@','/');
         readdirSync(dir,{withFileTypes: true}).forEach(item => {
             if (!item.isDirectory()) return;
             list.push(item.name);

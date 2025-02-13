@@ -9,6 +9,8 @@ import { getUsageByPID } from './stats.js';
 
 type ServerState = 'started' | 'stopping' | 'stopped' | 'forceStopping' | 'crashed'
 
+type ServerType = 'forge' | 'fabric' | 'vanilla' | 'spigot'
+
 export interface MySocket extends Socket {
     mcThis: { id: string, child: ChildProcessWithoutNullStreams }
 }
@@ -44,7 +46,7 @@ export interface serverStats {
 
 export class MinecraftServer {
     //@TODO make it so when a array gets to big it starts deleting old items
-    java8: boolean;
+    javaPath: string;
     //number in MB
     ramMax: number;
     name: string;
@@ -59,13 +61,13 @@ export class MinecraftServer {
     newTimer: boolean;
     stats: serverStats[];
     players: player[];
-    constructor(serverName: string, serverID: string, serverPath: string, java8 = true, ramMax = 1024) {
+    constructor(serverName: string, serverID: string, serverPath: string, javaPath = 'java', ramMax = 6144,serverType = '') {
         this.name = serverName;
         this.id = serverID;
         this.path = serverPath;
         this.ramMax = ramMax;
         this.state = 'stopped';
-        this.java8 = java8;
+        this.javaPath = javaPath;
         this.fullConsole = [];
         this.startTime = -1;
         this.timer = '';
@@ -109,7 +111,7 @@ export class MinecraftServer {
 
         info(this.id, 'Server is starting');
 
-        this.child = spawn('java8', [`-Xmx${this.ramMax}M`, '-jar', 'server.jar'], { 'cwd': this.path });
+        this.child = spawn('java', [`-Xmx${this.ramMax}M`, '-jar', 'server.jar'], { 'cwd': this.path });
         this.state = 'started';
 
         io.emit('start', { serverID: this.id });

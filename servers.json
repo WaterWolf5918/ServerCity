@@ -1,14 +1,8 @@
 [
     {
-        "name": "WG-Craft",
-        "id": "wg-craft",
-        "path": "C:\\Users\\lucas\\Downloads\\plainMinecraftServedr",
-        "autoStart": false
-    },
-    {
-        "name": "SG30 Clone",
-        "id": "sg50",
-        "path": "C:\\Users\\lucas\\Downloads\\plainMinecraftServedr",
+        "name": "Carrot+",
+        "id": "carrot-plus",
+        "path": "C:\\Users\\Lucas School\\Downloads\\server",
         "autoStart": false
     }
 ]
